@@ -31,11 +31,5 @@ def run_gitk():
 def handle_open_in_browser():
     data = request.json
     git, rel_path = map_container_path_to_git(Path(data["file"]))
-    url = repo_file_url(
-        git.remotes.origin.url,
-        rel_path,
-        line=data.get("lineNumber"),
-        branch=git.active_branch,
-    )
-    open_in_browser(url)
+    open_in_browser(git, rel_path, data.get("lineNumber"))
     return jsonify(None)

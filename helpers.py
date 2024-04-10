@@ -70,5 +70,11 @@ def map_container_path_to_git(path: Path) -> tuple[Repo, Path]:
     raise ValueError(f"Path {path} is not in any bind mounts")
 
 
-def open_in_browser(url: str):
+def open_in_browser(git: Repo, rel_path: Path, line: int | None):
+    url = repo_file_url(
+        git.remotes.origin.url,
+        rel_path,
+        line=line,
+        branch=git.active_branch,
+    )
     webbrowser.open(url)
