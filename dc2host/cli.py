@@ -2,7 +2,7 @@ import argparse
 from git import Repo
 from pathlib import Path
 
-from helpers import open_in_browser
+from .helpers import open_in_browser
 
 
 def main():
@@ -26,7 +26,3 @@ def _handle_open(args):
         repo_path = repo_path.parent
     git = Repo(repo_path)
     open_in_browser(git, file_path.relative_to(git.working_dir), args.line)
-
-
-if __name__ == "__main__":
-    main()

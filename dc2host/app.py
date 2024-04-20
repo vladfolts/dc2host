@@ -2,7 +2,7 @@ from pathlib import Path
 
 from flask import Flask, jsonify, request
 
-from helpers import map_container_path_to_git, open_in_browser, repo_file_url, run
+from .helpers import map_container_path_to_git, open_in_browser, repo_file_url, run
 
 app = Flask(__name__)
 

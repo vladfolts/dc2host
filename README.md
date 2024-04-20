@@ -2,7 +2,7 @@
 
 Run Flask on Windows host:
 ```shell
-python -m flask run --debug --host=0.0.0.0
+python -m flask --app dc2host.app run --debug --host=0.0.0.0
 ```
 
 ## Configure VS Code "tasks.json"
@@ -59,4 +59,9 @@ python -m flask run --debug --host=0.0.0.0
         "args": "Diff current file"
     }
 ]
+```
+
+## Command line interface
+```shell
+python -m dc2host open <path to file in repo> 
 ```
