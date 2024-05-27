@@ -1,6 +1,6 @@
 [project]
 name = "dc2host"
-version = "0.0.1"
+version = "1.0.0"
 dependencies = ["docker", "flask", "GitPython"]
 authors = [
   { name="Vlad Folts", email="vladfolts@gmail.com" },
@@ -20,3 +20,6 @@ Homepage = "https://github.com/vladfolts/dc2host"
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[tool.mypy]
+check_untyped_defs = true
