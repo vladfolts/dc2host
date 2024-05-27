@@ -1,5 +1,5 @@
 from urllib.parse import SplitResult
-from d2host.helpers import repo_root_url
+from dc2host.helpers import repo_root_url
 
 
 def test_repo_root_url_with_git_prefix():

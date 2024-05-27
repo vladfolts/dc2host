@@ -1,13 +1,14 @@
-from pathlib import Path
 import subprocess
+import webbrowser
+from pathlib import Path
 from shlex import quote
 from typing import Generator
 from urllib.parse import SplitResult, urlsplit, urlunsplit
-import webbrowser
 
 import docker
 from docker.models.containers import Container
 from git import Repo
+from werkzeug.exceptions import HTTPException
 
 
 def _gen_bind_mounts(container: Container) -> Generator[tuple[str, str], None, None]:
@@ -18,10 +19,13 @@ def _gen_bind_mounts(container: Container) -> Generator[tuple[str, str], None, N
                 yield src, dst
 
 
-def docker_bind_mounts() -> Generator[tuple[str, str], None, None]:
-    client = docker.from_env()
-    for c in client.containers.list():
-        yield from _gen_bind_mounts(c)
+class Host:
+    def __init__(self):
+        self.__docker = docker.from_env()
+
+    def docker_bind_mounts(self) -> Generator[tuple[str, str], None, None]:
+        for c in self.__docker.containers.list():
+            yield from _gen_bind_mounts(c)
 
 
 def git_remote(repo_path: str):
@@ -50,30 +54,38 @@ def repo_root_url(remote_url) -> SplitResult:
 def repo_file_url(
     remote_url: str, path: Path, line: int | None = None, branch: str = "master"
 ):
+    known_hosts_mapping = {"github.com": "/blob/{0}/{1}"}
+    default_mapping = "/-/blob/{0}/{1}"
+
     url_parts = repo_root_url(remote_url)
-    branch_path = {"github.com": f"/blob/{branch}/{path}"}.get(url_parts.hostname, f"/-/blob/{branch}/{path}")
+    if not (host := url_parts.hostname):
+        raise HTTPException("Cannot parse remote URL's host: " + remote_url)
+    
+    fmt = known_hosts_mapping.get(host, default_mapping)
+    branch_path = fmt.format(branch, path)
     url_parts = url_parts._replace(path=url_parts.path + branch_path)
     if line is not None:
         url_parts = url_parts._replace(fragment=f"L{line}")
     return urlunsplit(url_parts)
 
 
-def map_container_path_to_git(path: Path) -> tuple[Repo, Path]:
-    for src, dst in docker_bind_mounts():
+def map_container_path(host: Host, path: Path) -> Path:
+    for src, dst in host.docker_bind_mounts():
         try:
             rel_path = path.relative_to(dst)
         except ValueError:
             pass
         else:
-            return Repo(src), rel_path
+            return (src / rel_path).resolve()
 
     raise ValueError(f"Path {path} is not in any bind mounts")
 
 
-def open_in_browser(git: Repo, rel_path: Path, line: int | None):
+def open_in_browser(path: Path, line: int | None):
+    git = Repo(path if path.is_dir() else path.parent, search_parent_directories=True)
     url = repo_file_url(
         git.remotes.origin.url,
-        rel_path,
+        path.relative_to(git.working_dir),
         line=line,
         branch=git.active_branch,
     )

@@ -11,44 +11,26 @@ To resolve this problem `dc2host` runs a simple REST server on the host that han
 
 # Supported REST endpoints
 
-## git command
+## run command
 
 ```
-POST /run_git
+POST /run
 {
-    "cwd": <container directory where from to execute the specified git command>,
-    "args": ["arguments", "for", "git"]
+    "cwd": <container directory where from to execute the specified command>,
+    "args": ["command", "argument1", "argument2"],
+    "check": false|true - check for zero exit code
 }
 ```
 
-The git repo directory is guessed from "cwd".
-
 Example:
 ```shell
-curl -d "{\"args\": [\"difftool\", \"file/relative/path\"], \"cwd\": \"/workspace/directory\"}" -H "Content-Type: application/json" host.docker.internal:5000/run_git
+curl -d "{\"args\": [\"git\", \"difftool\", \"file/relative/path\"], \"cwd\": \"/workspace/directory\"}" -H "Content-Type: application/json" host.docker.internal:5000/run
 ```                
 
-
-## gitk command
-
-```
-POST /run_gitk
-{
-    "cwd": <container directory where from to execute the specified gitk command>,
-    "args": ["arguments", "for", "gitk"]
-}
-```
-
-The git repo directory is guessed from "cwd".
-
-Example:
-```shell
-curl -d "{\"args\": [\"file/relative/path\"], \"cwd\": \"/workspace/directory\"}" -H "Content-Type: application/json" host.docker.internal:5000/run_gitk
-```                
 
 ## open_in_browser command
 
-Opens the specified file from a local repo in web browser on GitHub. 
+Opens the specified file from a local repo in Web browser on GitHub/GitLab. 
 
 ```
 POST /open_in_browser
@@ -60,10 +42,16 @@ POST /open_in_browser
 
 Example:
 ```shell
-curl -d "{\"file\": \"file1.txt\", \"lineNumber\": 42}" -H "Content-Type: application/json" host.docker.internal:5000/run_gitk
+curl -d "{\"file\": \"file1.txt\", \"lineNumber\": 42}" -H "Content-Type: application/json" host.docker.internal:5000/run
 ```                
 
 # Quick start
+
+
+Open file "README.md" from a local directory on GitHub:
+```shell
+python -m dc2host open README.md 
+```
 
 Run Flask on Windows host:
 ```shell
@@ -76,7 +64,7 @@ python -m flask --app dc2host.app run --debug --host=0.0.0.0
 {
     "tasks": [
         {
-            "label": "Open in GitHub",
+            "label": "Open in GitHub/GitLab",
             "type": "process",
             "command": "curl",
             "args": [
@@ -93,10 +81,10 @@ python -m flask --app dc2host.app run --debug --host=0.0.0.0
             "command": "curl",
             "args": [
                 "-d",
-                "{\"args\": [\"difftool\", \"${relativeFile}\"], \"cwd\": \"${workspaceFolder}\"}",
+                "{\"args\": [\"git\", \"difftool\", \"${fileBasename}\"], \"cwd\": \"${fileDirname}\"}",
                 "-H",
                 "Content-Type: application/json",
-                "host.docker.internal:5000/run_git"
+                "host.docker.internal:5000/run"
             ],
         },
         {
@@ -105,10 +93,10 @@ python -m flask --app dc2host.app run --debug --host=0.0.0.0
             "command": "curl",
             "args": [
                 "-d",
-                "{\"args\": [\"--\", \"${relativeFile}\"], \"cwd\": \"${workspaceFolder}\"}",
+                "{\"args\": [\"gitk\", \"--\", \"${fileBasename}\"], \"cwd\": \"${fileDirname}\", \"check\": false}",
                 "-H",
                 "Content-Type: application/json",
-                "host.docker.internal:5000/run_gitk"
+                "host.docker.internal:5000/run"
             ],
         }
     ]
@@ -124,9 +112,4 @@ python -m flask --app dc2host.app run --debug --host=0.0.0.0
         "args": "Diff current file"
     }
 ]
-```
-
-## Command line interface
-```shell
-python -m dc2host open <path to file in repo> 
 ```
