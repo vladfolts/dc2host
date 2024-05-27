@@ -21,5 +21,12 @@ Homepage = "https://github.com/vladfolts/dc2host"
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[project.optional-dependencies]
+test = [
+    "types-docker",
+    "mypy",
+    "pytest",
+]
+
 [tool.mypy]
 check_untyped_defs = true
