@@ -50,7 +50,7 @@ curl -d "{\"file\": \"file1.txt\", \"lineNumber\": 42}" -H "Content-Type: applic
 
 Open file "README.md" from a local directory on GitHub:
 ```shell
-python -m dc2host open README.md 
+dc2host open README.md 
 ```
 
 Run Flask on Windows host:

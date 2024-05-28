@@ -23,3 +23,6 @@ jobs:
 
     - name: pytest
       run: python -m pytest tests
+
+    - name: smoke-test
+      run: dc2host open --help

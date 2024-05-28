@@ -17,6 +17,9 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/vladfolts/dc2host"
 
+[project.scripts]
+dc2host = "dc2host.cli:main"
+
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
