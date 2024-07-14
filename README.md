@@ -25,12 +25,12 @@ POST /run
 Example:
 ```shell
 curl -d "{\"args\": [\"git\", \"difftool\", \"file/relative/path\"], \"cwd\": \"/workspace/directory\"}" -H "Content-Type: application/json" host.docker.internal:5000/run
-```                
+```
 
 
 ## open_in_browser command
 
-Opens the specified file from a local repo in Web browser on GitHub/GitLab. 
+Opens the specified file from a local repo in Web browser on GitHub/GitLab.
 
 ```
 POST /open_in_browser
@@ -43,14 +43,14 @@ POST /open_in_browser
 Example:
 ```shell
 curl -d "{\"file\": \"file1.txt\", \"lineNumber\": 42}" -H "Content-Type: application/json" host.docker.internal:5000/run
-```                
+```
 
 # Quick start
 
 
 Open file "README.md" from a local directory on GitHub:
 ```shell
-dc2host open README.md 
+dc2host open README.md
 ```
 
 Run Flask on Windows host:
@@ -113,3 +113,6 @@ python -m flask --app dc2host.app run --debug --host=0.0.0.0
     }
 ]
 ```
+
+## WSL setup
+If you are using Dev Containers with WSL2 (using WSL2 filesystem) you should run the REST server under your WSL distro (not natively on Windows). In this case, the container paths are going to be translated to the WSL ones and the external tools will be launched as WSL processes. The external tools themselves might be native Windows applications as long as WSL2 allows running them.
